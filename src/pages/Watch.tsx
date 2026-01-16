@@ -46,7 +46,7 @@ const Watch = () => {
       
       {/* Main broadcast area */}
       <div className="flex-1 flex flex-col">
-        {/* Desktop layout */}
+        {/* Top section: Stream + Scores */}
         <div className="flex-1 flex flex-col lg:flex-row lg:gap-4 p-4">
           {/* Left: Stream + Mobile Scores Toggle */}
           <div className="flex-1 lg:flex-[3] flex flex-col gap-4">
@@ -75,20 +75,11 @@ const Watch = () => {
                 <LiveScores matches={data?.matches || []} isLoading={isLoading} />
               </div>
             </div>
-
-            {/* Mobile: Vidiprinter below stream */}
-            <div className="lg:hidden">
-              <Vidiprinter alerts={data?.alerts || []} isLoading={isLoading} />
-            </div>
           </div>
 
-          {/* Right rail - Desktop only */}
+          {/* Right rail - Desktop only: Live Scores */}
           <div className="hidden lg:flex flex-col gap-4 w-80 xl:w-96 flex-shrink-0">
-            {/* Live Scores */}
             <LiveScores matches={data?.matches || []} isLoading={isLoading} />
-            
-            {/* Vidiprinter */}
-            <Vidiprinter alerts={data?.alerts || []} isLoading={isLoading} />
             
             {/* Last updated */}
             {data && (
@@ -99,13 +90,19 @@ const Watch = () => {
           </div>
         </div>
 
-        {/* Ticker - Full width at bottom */}
-        <div className="sticky bottom-0 z-40">
+        {/* Ticker - Full width above Vidiprinter */}
+        <div className="px-4">
           <Ticker alerts={data?.alerts || []} />
-          {/* Mobile: Last updated */}
-          <div className="lg:hidden flex justify-center py-2 bg-background border-t border-border">
-            {data && <LastUpdated timestamp={data.lastUpdated} isPolling={isPolling} />}
-          </div>
+        </div>
+
+        {/* Vidiprinter - Full width */}
+        <div className="p-4">
+          <Vidiprinter alerts={data?.alerts || []} isLoading={isLoading} />
+        </div>
+
+        {/* Mobile: Last updated */}
+        <div className="lg:hidden flex justify-center py-2 bg-background border-t border-border">
+          {data && <LastUpdated timestamp={data.lastUpdated} isPolling={isPolling} />}
         </div>
       </div>
     </div>
