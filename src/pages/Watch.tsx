@@ -41,67 +41,57 @@ const Watch = () => {
   }, [fetchData]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="h-screen flex flex-col bg-background overflow-hidden">
       <Header />
       
-      {/* Main broadcast area */}
-      <div className="flex-1 flex flex-col">
+      {/* Main broadcast area - fills remaining height */}
+      <div className="flex-1 flex flex-col min-h-0 p-4 gap-2">
         {/* Top section: Stream + Scores */}
-        <div className="flex-1 flex flex-col lg:flex-row lg:gap-4 p-4">
-          {/* Left: Stream + Mobile Scores Toggle */}
-          <div className="flex-1 lg:flex-[3] flex flex-col gap-4">
-            {/* Stream - Main focus */}
-            <div className="flex-shrink-0">
-              <StreamEmbed />
-            </div>
-
-            {/* Mobile: Collapsible Scores */}
-            <div className="lg:hidden">
-              <button
-                onClick={() => setScoresExpanded(!scoresExpanded)}
-                className="w-full flex items-center justify-between px-4 py-3 broadcast-card rounded-lg"
-              >
-                <span className="font-medium text-sm">Live Scores</span>
-                {scoresExpanded ? (
-                  <ChevronUp className="w-4 h-4 text-muted-foreground" />
-                ) : (
-                  <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                )}
-              </button>
-              <div className={cn(
-                "mt-2 transition-all duration-300 overflow-hidden",
-                scoresExpanded ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
-              )}>
-                <LiveScores matches={data?.matches || []} isLoading={isLoading} />
-              </div>
-            </div>
+        <div className="flex flex-col lg:flex-row lg:gap-4 flex-shrink-0">
+          {/* Left: Stream */}
+          <div className="flex-1 lg:flex-[3]">
+            <StreamEmbed />
           </div>
 
           {/* Right rail - Desktop only: Live Scores */}
-          <div className="hidden lg:flex flex-col gap-4 w-80 xl:w-96 flex-shrink-0">
+          <div className="hidden lg:block w-80 xl:w-96 flex-shrink-0">
             <LiveScores matches={data?.matches || []} isLoading={isLoading} />
-            
-            {/* Last updated */}
-            {data && (
-              <div className="flex justify-end">
-                <LastUpdated timestamp={data.lastUpdated} isPolling={isPolling} />
-              </div>
-            )}
+          </div>
+
+          {/* Mobile: Collapsible Scores */}
+          <div className="lg:hidden mt-4">
+            <button
+              onClick={() => setScoresExpanded(!scoresExpanded)}
+              className="w-full flex items-center justify-between px-4 py-3 broadcast-card rounded-lg"
+            >
+              <span className="font-medium text-sm">Live Scores</span>
+              {scoresExpanded ? (
+                <ChevronUp className="w-4 h-4 text-muted-foreground" />
+              ) : (
+                <ChevronDown className="w-4 h-4 text-muted-foreground" />
+              )}
+            </button>
+            <div className={cn(
+              "mt-2 transition-all duration-300 overflow-hidden",
+              scoresExpanded ? "max-h-[300px] opacity-100" : "max-h-0 opacity-0"
+            )}>
+              <LiveScores matches={data?.matches || []} isLoading={isLoading} />
+            </div>
           </div>
         </div>
 
-        {/* Ticker - Full width above Vidiprinter */}
-        <div className="px-4">
+        {/* Ticker - Full width */}
+        <div className="flex-shrink-0">
           <Ticker alerts={data?.alerts || []} />
         </div>
 
-        {/* Vidiprinter - Full width */}
-        <div className="p-4">
+        {/* Vidiprinter - Fills remaining space */}
+        <div className="flex-1 min-h-0">
           <Vidiprinter alerts={data?.alerts || []} isLoading={isLoading} />
         </div>
 
-        {/* Mobile: Last updated */}
-        <div className="lg:hidden flex justify-center py-2 bg-background border-t border-border">
+        {/* Last updated - Bottom aligned */}
+        <div className="flex-shrink-0 flex justify-center py-2 border-t border-border">
           {data && <LastUpdated timestamp={data.lastUpdated} isPolling={isPolling} />}
         </div>
       </div>
