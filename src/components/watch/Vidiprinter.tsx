@@ -41,8 +41,8 @@ const Vidiprinter = ({ alerts, isLoading }: VidiprinterProps) => {
   }
 
   return (
-    <div className="broadcast-card overflow-hidden">
-      <div className="px-4 py-3 border-b border-border flex items-center justify-between">
+    <div className="broadcast-card overflow-hidden h-full flex flex-col">
+      <div className="px-4 py-3 border-b border-border flex items-center justify-between flex-shrink-0">
         <h2 className="font-display font-semibold text-sm uppercase tracking-wide flex items-center gap-2">
           <Radio className="w-4 h-4 text-primary" />
           Vidiprinter
@@ -68,7 +68,7 @@ const Vidiprinter = ({ alerts, isLoading }: VidiprinterProps) => {
         </div>
       </div>
 
-      <div className="max-h-[300px] overflow-y-auto">
+      <div className="flex-1 overflow-y-auto min-h-0">
         {filteredAlerts.length === 0 ? (
           <div className="p-6 text-center">
             <p className="text-muted-foreground text-sm">No updates yet</p>
