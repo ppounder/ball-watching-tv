@@ -6,6 +6,7 @@ import LiveScores from '@/components/watch/LiveScores';
 import Ticker from '@/components/watch/Ticker';
 import Vidiprinter from '@/components/watch/Vidiprinter';
 import LastUpdated from '@/components/watch/LastUpdated';
+import AdPanel from '@/components/watch/AdPanel';
 import { getMockBroadcastData } from '@/data/mockData';
 import { BroadcastData } from '@/types/broadcast';
 import { cn } from '@/lib/utils';
@@ -85,9 +86,17 @@ const Watch = () => {
           <Ticker alerts={data?.alerts || []} />
         </div>
 
-        {/* Vidiprinter - Fills remaining space */}
-        <div className="flex-1 min-h-0">
-          <Vidiprinter alerts={data?.alerts || []} isLoading={isLoading} />
+        {/* Vidiprinter + Ad Panel - Same layout as stream + scores */}
+        <div className="flex-1 min-h-0 flex flex-col lg:flex-row lg:gap-4">
+          {/* Left: Vidiprinter - matches stream width */}
+          <div className="flex-1 lg:flex-[3] min-h-0">
+            <Vidiprinter alerts={data?.alerts || []} isLoading={isLoading} />
+          </div>
+
+          {/* Right: Ad/Match Details Panel - matches scores width */}
+          <div className="hidden lg:block w-80 xl:w-96 flex-shrink-0">
+            <AdPanel />
+          </div>
         </div>
 
         {/* Last updated - Bottom aligned */}
