@@ -1,1 +1,4 @@
 project_id = "pwpewpymzibnewdosxiq"
+
+[functions.get-broadcast-data]
+verify_jwt = false
