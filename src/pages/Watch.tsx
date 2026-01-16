@@ -59,7 +59,7 @@ const Watch = () => {
 
           {/* Right rail - Desktop only: Live Scores */}
           <div className="hidden lg:block w-80 xl:w-96 flex-shrink-0">
-            <LiveScores matches={data?.matches || []} isLoading={isLoading} />
+            <LiveScores />
           </div>
 
           {/* Mobile: Collapsible Scores */}
@@ -79,7 +79,7 @@ const Watch = () => {
               "mt-2 transition-all duration-300 overflow-hidden",
               scoresExpanded ? "max-h-[300px] opacity-100" : "max-h-0 opacity-0"
             )}>
-              <LiveScores matches={data?.matches || []} isLoading={isLoading} />
+              <LiveScores />
             </div>
           </div>
         </div>
