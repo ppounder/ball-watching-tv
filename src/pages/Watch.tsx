@@ -7,7 +7,7 @@ import Ticker from '@/components/watch/Ticker';
 import Vidiprinter from '@/components/watch/Vidiprinter';
 import LastUpdated from '@/components/watch/LastUpdated';
 import AdPanel from '@/components/watch/AdPanel';
-import { getMockBroadcastData } from '@/data/mockData';
+import { supabase } from '@/integrations/supabase/client';
 import { BroadcastData } from '@/types/broadcast';
 import { cn } from '@/lib/utils';
 
@@ -22,11 +22,14 @@ const Watch = () => {
   const fetchData = useCallback(async () => {
     setIsPolling(true);
     try {
-      // In production, this would call the Supabase edge function
-      // For now, use mock data
-      await new Promise(resolve => setTimeout(resolve, 300)); // Simulate network delay
-      const newData = getMockBroadcastData();
-      setData(newData);
+      const { data: broadcastData, error } = await supabase.functions.invoke('get-broadcast-data');
+      
+      if (error) {
+        console.error('Failed to fetch broadcast data:', error);
+        return;
+      }
+      
+      setData(broadcastData as BroadcastData);
     } catch (error) {
       console.error('Failed to fetch broadcast data:', error);
     } finally {
