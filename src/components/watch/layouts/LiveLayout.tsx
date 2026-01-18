@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 import StreamEmbed from '@/components/watch/StreamEmbed';
+import BroadcastHeader from '@/components/watch/BroadcastHeader';
 import LiveScores from '@/components/watch/LiveScores';
 import ScheduleFixtures from '@/components/watch/ScheduleFixtures';
 import Ticker from '@/components/watch/Ticker';
@@ -33,6 +34,7 @@ const LiveLayout = ({ alerts, isLoading, bundle, currentItem, nextItem }: LiveLa
       <div className="flex flex-col lg:flex-row lg:gap-4 flex-shrink-0">
         {/* Left: Stream */}
         <div className="flex-1 lg:flex-[3]">
+          <BroadcastHeader mode="LIVE" />
           <StreamEmbed />
         </div>
 

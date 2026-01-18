@@ -1,3 +1,5 @@
+import StreamEmbed from '@/components/watch/StreamEmbed';
+import BroadcastHeader from '@/components/watch/BroadcastHeader';
 import LiveScores from '@/components/watch/LiveScores';
 import Ticker from '@/components/watch/Ticker';
 import { Alert } from '@/types/broadcast';
@@ -10,13 +12,17 @@ interface MatchdayLayoutProps {
 const MatchdayLayout = ({ alerts, isLoading }: MatchdayLayoutProps) => {
   return (
     <>
-      {/* Today's fixtures - Prominent display */}
+      {/* Top section: Stream + Scores */}
       <div className="flex flex-col lg:flex-row lg:gap-4 flex-shrink-0">
-        <div className="flex-1">
-          <div className="broadcast-card rounded-lg p-6">
-            <h2 className="text-xl font-bold mb-4">Today's Matches</h2>
-            <LiveScores />
-          </div>
+        {/* Left: Stream */}
+        <div className="flex-1 lg:flex-[3]">
+          <BroadcastHeader mode="MATCHDAY" />
+          <StreamEmbed />
+        </div>
+
+        {/* Right rail: Today's fixtures */}
+        <div className="hidden lg:block w-80 xl:w-96 flex-shrink-0">
+          <LiveScores />
         </div>
       </div>
 
