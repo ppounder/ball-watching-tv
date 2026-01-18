@@ -1,4 +1,6 @@
 import { Mic, Play } from 'lucide-react';
+import StreamEmbed from '@/components/watch/StreamEmbed';
+import BroadcastHeader from '@/components/watch/BroadcastHeader';
 import LiveScores from '@/components/watch/LiveScores';
 import UpNext from '@/components/watch/UpNext';
 import { NowBundle, ScheduleItem } from '@/types/scheduler';
@@ -25,34 +27,12 @@ const PodcastLayout = ({ bundle, currentItem, nextItem }: PodcastLayoutProps) =>
 
   return (
     <>
-      {/* Top section: Podcast player + Scores sidebar */}
+      {/* Top section: Stream + Scores sidebar */}
       <div className="flex flex-col lg:flex-row lg:gap-4 flex-shrink-0">
-        {/* Left: Podcast main area */}
+        {/* Left: Stream */}
         <div className="flex-1 lg:flex-[3]">
-          <div className="broadcast-card rounded-lg p-8">
-            <div className="flex flex-col items-center text-center">
-              {/* Podcast artwork */}
-              <div className="w-48 h-48 bg-gradient-to-br from-purple-600 to-purple-900 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
-                <Mic className="w-24 h-24 text-white/90" />
-              </div>
-
-              {/* Now Playing badge */}
-              <div className="inline-flex items-center gap-2 bg-purple-500/20 text-purple-400 px-4 py-1.5 rounded-full mb-4">
-                <span className="w-2 h-2 bg-purple-500 rounded-full animate-pulse" />
-                <span className="text-sm font-medium">Now Playing</span>
-              </div>
-
-              {/* Show title */}
-              <h2 className="text-2xl font-bold mb-2">{title}</h2>
-              <p className="text-muted-foreground mb-6">{description}</p>
-
-              {/* Play button placeholder */}
-              <button className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 rounded-full transition-colors">
-                <Play className="w-5 h-5" />
-                <span className="font-medium">Listen Now</span>
-              </button>
-            </div>
-          </div>
+          <BroadcastHeader mode="PODCAST" subtitle={title} />
+          <StreamEmbed />
         </div>
 
         {/* Right rail: Live Scores */}

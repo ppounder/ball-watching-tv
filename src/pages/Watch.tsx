@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import Header from '@/components/Header';
 import LastUpdated from '@/components/watch/LastUpdated';
 import ChannelModeIndicator from '@/components/watch/ChannelModeIndicator';
+import LayoutSwitcher from '@/components/watch/LayoutSwitcher';
 import {
   LiveLayout,
   MatchdayLayout,
@@ -23,8 +24,12 @@ const Watch = () => {
   const [data, setData] = useState<BroadcastData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isPolling, setIsPolling] = useState(false);
+  const [overrideMode, setOverrideMode] = useState<ChannelMode | null>(null);
   
-  const { mode, bundle, isLoading: isSchedulerLoading } = useSchedulerState();
+  const { mode: schedulerMode, bundle, isLoading: isSchedulerLoading } = useSchedulerState();
+  
+  // Use override mode if set, otherwise use scheduler mode
+  const mode = overrideMode ?? schedulerMode;
 
   // Derive current and next items from the bundle
   const currentItem = useMemo(() => getCurrentItem(bundle), [bundle]);
@@ -121,6 +126,9 @@ const Watch = () => {
           {data && <LastUpdated timestamp={data.lastUpdated} isPolling={isPolling} />}
         </div>
       </div>
+
+      {/* Dev-only layout switcher */}
+      <LayoutSwitcher currentMode={mode} onModeChange={setOverrideMode} />
     </div>
   );
 };

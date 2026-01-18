@@ -1,4 +1,5 @@
-import { Newspaper } from 'lucide-react';
+import StreamEmbed from '@/components/watch/StreamEmbed';
+import BroadcastHeader from '@/components/watch/BroadcastHeader';
 import LiveScores from '@/components/watch/LiveScores';
 import Ticker from '@/components/watch/Ticker';
 import UpNext from '@/components/watch/UpNext';
@@ -20,25 +21,12 @@ const NewsLayout = ({ alerts, isLoading, bundle, currentItem, nextItem }: NewsLa
 
   return (
     <>
-      {/* Top section: News content + Scores sidebar */}
+      {/* Top section: Stream + Scores sidebar */}
       <div className="flex flex-col lg:flex-row lg:gap-4 flex-shrink-0">
-        {/* Left: News main area */}
+        {/* Left: Stream */}
         <div className="flex-1 lg:flex-[3]">
-          <div className="broadcast-card rounded-lg p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <Newspaper className="w-8 h-8 text-blue-500" />
-              <div>
-                <h2 className="text-xl font-bold">Ball Watching News</h2>
-                <p className="text-sm text-muted-foreground">{scopeDisplay} News</p>
-              </div>
-            </div>
-            
-            <div className="mt-6 p-4 bg-secondary/30 rounded-lg">
-              <p className="text-muted-foreground text-center">
-                News content for {scopeDisplay} will appear here
-              </p>
-            </div>
-          </div>
+          <BroadcastHeader mode="NEWS" subtitle={`${scopeDisplay} News`} />
+          <StreamEmbed />
         </div>
 
         {/* Right rail: Live Scores */}
