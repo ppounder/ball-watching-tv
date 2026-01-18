@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.get-todays-fixtures]
 verify_jwt = false
+
+[functions.get-scheduler-state]
+verify_jwt = false
