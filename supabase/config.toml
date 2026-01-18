@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.get-scheduler-state]
 verify_jwt = false
+
+[functions.get-fixtures-by-ids]
+verify_jwt = false
