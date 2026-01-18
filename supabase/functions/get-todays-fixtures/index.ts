@@ -84,24 +84,37 @@ serve(async (req) => {
     for (const [leagueId, leagueName] of Object.entries(competitionsMap)) {
       const fixturesSetKey = `bw:matchday:${today}:comp:${leagueId}:fixtures`;
       
+      console.log(`Querying Redis set: ${fixturesSetKey}`);
+      
       // Get fixture IDs from the set
       const fixtureIdsResponse = await fetch(`${UPSTASH_REDIS_REST_URL}/smembers/${encodeURIComponent(fixturesSetKey)}`, {
         headers: { Authorization: `Bearer ${UPSTASH_REDIS_REST_TOKEN}` },
       });
 
       if (!fixtureIdsResponse.ok) {
-        console.log(`No fixtures found for league ${leagueId}`);
+        console.log(`No fixtures found for league ${leagueId} (HTTP ${fixtureIdsResponse.status})`);
         continue;
       }
 
       const fixtureIdsData = await fixtureIdsResponse.json();
-      const fixtureIds: string[] = fixtureIdsData.result || [];
+      console.log(`Raw smembers response for ${leagueName}:`, JSON.stringify(fixtureIdsData));
+      
+      // Handle both properly stored IDs and space-separated strings (data issue workaround)
+      let fixtureIds: string[] = [];
+      if (fixtureIdsData.result && Array.isArray(fixtureIdsData.result)) {
+        for (const item of fixtureIdsData.result) {
+          // Split by space in case IDs were stored concatenated
+          const splitIds = item.toString().trim().split(/\s+/);
+          fixtureIds.push(...splitIds.filter((id: string) => id.length > 0));
+        }
+      }
 
       if (fixtureIds.length === 0) {
+        console.log(`Empty fixture set for ${leagueName}`);
         continue;
       }
 
-      console.log(`Found ${fixtureIds.length} fixtures for league ${leagueName}`);
+      console.log(`Found ${fixtureIds.length} fixture IDs for league ${leagueName}:`, fixtureIds);
 
       // Fetch each fixture's details
       const fixtures: Fixture[] = [];
