@@ -34,13 +34,14 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    console.log('Raw Redis response:', JSON.stringify(data));
+    console.log('Raw Redis response received, parsing...');
 
     if (!data.result) {
       console.log('No scheduler state found in Redis, defaulting to OFF_AIR');
       return new Response(
         JSON.stringify({
           mode: 'OFF_AIR',
+          bundle: null,
           lastUpdated: new Date().toISOString(),
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -56,15 +57,18 @@ serve(async (req) => {
       throw new Error('Invalid JSON in scheduler state');
     }
 
-    console.log('Parsed now_bundle:', JSON.stringify(nowBundle));
-
     const mode = nowBundle?.channel_state?.mode || 'OFF_AIR';
     
     console.log(`Channel mode: ${mode}`);
+    console.log(`Schedule items count: ${nowBundle?.items?.length || 0}`);
+    console.log(`Live blocks count: ${nowBundle?.blocks?.length || 0}`);
+    console.log(`Current schedule item ID: ${nowBundle?.now?.current_schedule_item_id || 'none'}`);
+    console.log(`Next schedule item ID: ${nowBundle?.now?.next_schedule_item_id || 'none'}`);
 
     return new Response(
       JSON.stringify({
         mode,
+        bundle: nowBundle,
         lastUpdated: new Date().toISOString(),
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -76,6 +80,7 @@ serve(async (req) => {
       JSON.stringify({ 
         error: errorMessage,
         mode: 'OFF_AIR', // Fallback to OFF_AIR on error
+        bundle: null,
         lastUpdated: new Date().toISOString(),
       }),
       { 

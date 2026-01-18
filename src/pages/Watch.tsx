@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import Header from '@/components/Header';
 import LastUpdated from '@/components/watch/LastUpdated';
 import ChannelModeIndicator from '@/components/watch/ChannelModeIndicator';
@@ -8,11 +8,14 @@ import {
   OffAirLayout,
   PostMatchdayLayout,
   NoneMatchdayLayout,
+  NewsLayout,
+  PodcastLayout,
 } from '@/components/watch/layouts';
 import { supabase } from '@/integrations/supabase/client';
 import { BroadcastData } from '@/types/broadcast';
 import { useSchedulerState } from '@/hooks/useSchedulerState';
 import { ChannelMode } from '@/types/scheduler';
+import { getCurrentItem, getNextItem } from '@/utils/scheduleUtils';
 
 const POLL_INTERVAL = 5000; // 5 seconds
 
@@ -21,7 +24,11 @@ const Watch = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isPolling, setIsPolling] = useState(false);
   
-  const { mode, isLoading: isSchedulerLoading } = useSchedulerState();
+  const { mode, bundle, isLoading: isSchedulerLoading } = useSchedulerState();
+
+  // Derive current and next items from the bundle
+  const currentItem = useMemo(() => getCurrentItem(bundle), [bundle]);
+  const nextItem = useMemo(() => getNextItem(bundle), [bundle]);
 
   const fetchData = useCallback(async () => {
     setIsPolling(true);
@@ -53,7 +60,33 @@ const Watch = () => {
     
     switch (currentMode) {
       case 'LIVE':
-        return <LiveLayout alerts={alerts} isLoading={isLoading} />;
+        return (
+          <LiveLayout 
+            alerts={alerts} 
+            isLoading={isLoading} 
+            bundle={bundle}
+            currentItem={currentItem}
+            nextItem={nextItem}
+          />
+        );
+      case 'NEWS':
+        return (
+          <NewsLayout 
+            alerts={alerts} 
+            isLoading={isLoading}
+            bundle={bundle}
+            currentItem={currentItem}
+            nextItem={nextItem}
+          />
+        );
+      case 'PODCAST':
+        return (
+          <PodcastLayout 
+            bundle={bundle}
+            currentItem={currentItem}
+            nextItem={nextItem}
+          />
+        );
       case 'MATCHDAY':
         return <MatchdayLayout alerts={alerts} isLoading={isLoading} />;
       case 'POST_MATCHDAY':

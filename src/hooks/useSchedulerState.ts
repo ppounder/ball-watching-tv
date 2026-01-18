@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { ChannelMode, SchedulerData } from '@/types/scheduler';
+import { ChannelMode, SchedulerData, NowBundle } from '@/types/scheduler';
 
-const SCHEDULER_POLL_INTERVAL = 5 * 60 * 1000; // 5 minutes
+const SCHEDULER_POLL_INTERVAL = 45 * 1000; // 45 seconds (between 30-60s as requested)
 
 export const useSchedulerState = () => {
   const [mode, setMode] = useState<ChannelMode>('OFF_AIR');
+  const [bundle, setBundle] = useState<NowBundle | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -22,9 +23,10 @@ export const useSchedulerState = () => {
       }
       
       const schedulerData = data as SchedulerData;
-      console.log('Scheduler state received:', schedulerData);
+      console.log('Scheduler state received:', schedulerData.mode);
       
       setMode(schedulerData.mode);
+      setBundle(schedulerData.bundle);
       setLastUpdated(schedulerData.lastUpdated);
       setError(null);
     } catch (err) {
@@ -38,7 +40,7 @@ export const useSchedulerState = () => {
   useEffect(() => {
     fetchSchedulerState();
     
-    // Poll for scheduler state every 5 minutes
+    // Poll for scheduler state every 45 seconds
     const interval = setInterval(fetchSchedulerState, SCHEDULER_POLL_INTERVAL);
     
     return () => clearInterval(interval);
@@ -46,6 +48,7 @@ export const useSchedulerState = () => {
 
   return {
     mode,
+    bundle,
     isLoading,
     lastUpdated,
     error,

@@ -1,20 +1,31 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 import StreamEmbed from '@/components/watch/StreamEmbed';
 import LiveScores from '@/components/watch/LiveScores';
+import ScheduleFixtures from '@/components/watch/ScheduleFixtures';
 import Ticker from '@/components/watch/Ticker';
 import Vidiprinter from '@/components/watch/Vidiprinter';
 import AdPanel from '@/components/watch/AdPanel';
+import UpNext from '@/components/watch/UpNext';
 import { Alert } from '@/types/broadcast';
+import { NowBundle, ScheduleItem } from '@/types/scheduler';
 import { cn } from '@/lib/utils';
+import { getFixtureIdsForLive } from '@/utils/scheduleUtils';
 
 interface LiveLayoutProps {
   alerts: Alert[];
   isLoading: boolean;
+  bundle: NowBundle | null;
+  currentItem: ScheduleItem | null;
+  nextItem: ScheduleItem | null;
 }
 
-const LiveLayout = ({ alerts, isLoading }: LiveLayoutProps) => {
+const LiveLayout = ({ alerts, isLoading, bundle, currentItem, nextItem }: LiveLayoutProps) => {
   const [scoresExpanded, setScoresExpanded] = useState(true);
+
+  // Get fixture IDs from the active LIVE block
+  const liveFixtureIds = useMemo(() => getFixtureIdsForLive(bundle), [bundle]);
+  const hasScheduleFixtures = liveFixtureIds.length > 0;
 
   return (
     <>
@@ -25,9 +36,13 @@ const LiveLayout = ({ alerts, isLoading }: LiveLayoutProps) => {
           <StreamEmbed />
         </div>
 
-        {/* Right rail - Desktop only: Live Scores */}
+        {/* Right rail - Desktop only: Schedule Fixtures or rotating LiveScores */}
         <div className="hidden lg:block w-80 xl:w-96 flex-shrink-0">
-          <LiveScores />
+          {hasScheduleFixtures ? (
+            <ScheduleFixtures fixtureIds={liveFixtureIds} />
+          ) : (
+            <LiveScores />
+          )}
         </div>
 
         {/* Mobile: Collapsible Scores */}
@@ -47,10 +62,17 @@ const LiveLayout = ({ alerts, isLoading }: LiveLayoutProps) => {
             "mt-2 transition-all duration-300 overflow-hidden",
             scoresExpanded ? "max-h-[300px] opacity-100" : "max-h-0 opacity-0"
           )}>
-            <LiveScores />
+            {hasScheduleFixtures ? (
+              <ScheduleFixtures fixtureIds={liveFixtureIds} />
+            ) : (
+              <LiveScores />
+            )}
           </div>
         </div>
       </div>
+
+      {/* Up Next strip */}
+      {nextItem && <UpNext nextItem={nextItem} />}
 
       {/* Ticker - Full width */}
       <div className="flex-shrink-0">
