@@ -12,6 +12,7 @@ interface UseScheduleFixturesOptions {
 export const useScheduleFixtures = ({ fixtureIds, enabled = true }: UseScheduleFixturesOptions) => {
   const [fixtures, setFixtures] = useState<FixtureData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [lastUpdated, setLastUpdated] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const fetchFixtures = useCallback(async () => {
@@ -37,6 +38,7 @@ export const useScheduleFixtures = ({ fixtureIds, enabled = true }: UseScheduleF
       console.log(`Received ${fixturesData.length} fixtures for schedule`);
       
       setFixtures(fixturesData);
+      setLastUpdated(Date.now());
       setError(null);
     } catch (err) {
       console.error('Error fetching schedule fixtures:', err);
@@ -64,6 +66,7 @@ export const useScheduleFixtures = ({ fixtureIds, enabled = true }: UseScheduleF
   return {
     fixtures,
     isLoading,
+    lastUpdated,
     error,
     refetch: fetchFixtures,
   };

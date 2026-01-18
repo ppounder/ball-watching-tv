@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import Header from '@/components/Header';
 import LastUpdated from '@/components/watch/LastUpdated';
 import ChannelModeIndicator from '@/components/watch/ChannelModeIndicator';
@@ -13,22 +13,16 @@ import {
   NewsLayout,
   PodcastLayout,
 } from '@/components/watch/layouts';
-import { supabase } from '@/integrations/supabase/client';
-import { BroadcastData } from '@/types/broadcast';
 import { useSchedulerState } from '@/hooks/useSchedulerState';
+import { useScheduleFixtures } from '@/hooks/useScheduleFixtures';
 import { ChannelMode } from '@/types/scheduler';
-import { getCurrentItem, getNextItem } from '@/utils/scheduleUtils';
-
-const POLL_INTERVAL = 5000; // 5 seconds
+import { getCurrentItem, getNextItem, getFixtureIdsForLive } from '@/utils/scheduleUtils';
 
 const Watch = () => {
-  const [data, setData] = useState<BroadcastData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isPolling, setIsPolling] = useState(false);
   const [overrideMode, setOverrideMode] = useState<ChannelMode | null>(null);
   const [scheduleOpen, setScheduleOpen] = useState(false);
   
-  const { mode: schedulerMode, bundle, isLoading: isSchedulerLoading } = useSchedulerState();
+  const { mode: schedulerMode, bundle, isLoading: isSchedulerLoading, lastUpdated: schedulerLastUpdated } = useSchedulerState();
   
   // Use override mode if set, otherwise use scheduler mode
   const mode = overrideMode ?? schedulerMode;
@@ -37,40 +31,34 @@ const Watch = () => {
   const currentItem = useMemo(() => getCurrentItem(bundle), [bundle]);
   const nextItem = useMemo(() => getNextItem(bundle), [bundle]);
 
-  const fetchData = useCallback(async () => {
-    setIsPolling(true);
-    try {
-      const { data: broadcastData, error } = await supabase.functions.invoke('get-broadcast-data');
-      
-      if (error) {
-        console.error('Failed to fetch broadcast data:', error);
-        return;
-      }
-      
-      setData(broadcastData as BroadcastData);
-    } catch (error) {
-      console.error('Failed to fetch broadcast data:', error);
-    } finally {
-      setIsLoading(false);
-      setIsPolling(false);
-    }
-  }, []);
+  // Get fixture IDs for LIVE mode polling
+  const liveFixtureIds = useMemo(() => getFixtureIdsForLive(bundle), [bundle]);
+  
+  // Poll fixtures when in LIVE mode (this provides the faster polling for live scores)
+  const { lastUpdated: fixturesLastUpdated } = useScheduleFixtures({
+    fixtureIds: liveFixtureIds,
+    enabled: mode === 'LIVE' && liveFixtureIds.length > 0,
+  });
 
-  useEffect(() => {
-    fetchData();
-    const interval = setInterval(fetchData, POLL_INTERVAL);
-    return () => clearInterval(interval);
-  }, [fetchData]);
+  // Use fixtures timestamp for LIVE mode, scheduler timestamp for other modes
+  const displayLastUpdated = useMemo(() => {
+    if (mode === 'LIVE' && fixturesLastUpdated) {
+      return fixturesLastUpdated;
+    }
+    // Convert scheduler lastUpdated (ISO string) to timestamp
+    return schedulerLastUpdated ? new Date(schedulerLastUpdated).getTime() : null;
+  }, [mode, fixturesLastUpdated, schedulerLastUpdated]);
 
   const renderLayout = (currentMode: ChannelMode) => {
-    const alerts = data?.alerts || [];
+    // Alerts are no longer fetched - passing empty array for now
+    const alerts: never[] = [];
     
     switch (currentMode) {
       case 'LIVE':
         return (
           <LiveLayout 
             alerts={alerts} 
-            isLoading={isLoading} 
+            isLoading={isSchedulerLoading} 
             bundle={bundle}
             currentItem={currentItem}
             nextItem={nextItem}
@@ -80,7 +68,7 @@ const Watch = () => {
         return (
           <NewsLayout 
             alerts={alerts} 
-            isLoading={isLoading}
+            isLoading={isSchedulerLoading}
             bundle={bundle}
             currentItem={currentItem}
             nextItem={nextItem}
@@ -95,9 +83,9 @@ const Watch = () => {
           />
         );
       case 'MATCHDAY':
-        return <MatchdayLayout alerts={alerts} isLoading={isLoading} />;
+        return <MatchdayLayout alerts={alerts} isLoading={isSchedulerLoading} />;
       case 'POST_MATCHDAY':
-        return <PostMatchdayLayout alerts={alerts} isLoading={isLoading} />;
+        return <PostMatchdayLayout alerts={alerts} isLoading={isSchedulerLoading} />;
       case 'NONE_MATCHDAY':
         return <NoneMatchdayLayout />;
       case 'OFF_AIR':
@@ -132,7 +120,7 @@ const Watch = () => {
 
         {/* Last updated - Bottom aligned */}
         <div className="flex-shrink-0 flex justify-center py-2 border-t border-border">
-          {data && <LastUpdated timestamp={data.lastUpdated} isPolling={isPolling} />}
+          {displayLastUpdated && <LastUpdated timestamp={displayLastUpdated} isPolling={false} />}
         </div>
       </div>
 
