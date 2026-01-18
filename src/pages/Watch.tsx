@@ -100,7 +100,7 @@ const Watch = () => {
         return <NoneMatchdayLayout />;
       case 'OFF_AIR':
       default:
-        return <OffAirLayout />;
+        return <OffAirLayout nextItem={nextItem} />;
     }
   };
 
