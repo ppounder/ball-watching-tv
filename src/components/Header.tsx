@@ -2,14 +2,29 @@ import { Link, useLocation } from 'react-router-dom';
 import { Calendar } from 'lucide-react';
 import logo from '@/assets/bw-logo-text.png';
 import { Button } from '@/components/ui/button';
+import { ChannelMode } from '@/types/scheduler';
+import { cn } from '@/lib/utils';
 
 interface HeaderProps {
   onScheduleClick?: () => void;
+  channelMode?: ChannelMode;
 }
 
-const Header = ({ onScheduleClick }: HeaderProps) => {
+const modeConfig: Record<ChannelMode, { label: string; colorClass: string }> = {
+  LIVE: { label: 'Live', colorClass: 'bg-red-500' },
+  NEWS: { label: 'News', colorClass: 'bg-blue-500' },
+  PODCAST: { label: 'Podcast', colorClass: 'bg-purple-500' },
+  MATCHDAY: { label: 'Matchday', colorClass: 'bg-green-500' },
+  POST_MATCHDAY: { label: 'Post-Match', colorClass: 'bg-blue-500' },
+  NONE_MATCHDAY: { label: 'No Matches', colorClass: 'bg-gray-500' },
+  OFF_AIR: { label: 'Off Air', colorClass: 'bg-gray-700' },
+};
+
+const Header = ({ onScheduleClick, channelMode }: HeaderProps) => {
   const location = useLocation();
   const isWatchPage = location.pathname === '/watch';
+  
+  const config = channelMode ? modeConfig[channelMode] : modeConfig.OFF_AIR;
 
   return (
     <header className="sticky top-0 z-50 glass border-b border-border/50">
@@ -31,10 +46,16 @@ const Header = ({ onScheduleClick }: HeaderProps) => {
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                  <span className={cn(
+                    "animate-ping absolute inline-flex h-full w-full rounded-full opacity-75",
+                    config.colorClass
+                  )}></span>
+                  <span className={cn(
+                    "relative inline-flex rounded-full h-2 w-2",
+                    config.colorClass
+                  )}></span>
                 </span>
-                Broadcasting
+                {config.label}
               </div>
               
               {onScheduleClick && (

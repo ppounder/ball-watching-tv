@@ -1,7 +1,6 @@
 import { useState, useMemo } from 'react';
 import Header from '@/components/Header';
 import LastUpdated from '@/components/watch/LastUpdated';
-import ChannelModeIndicator from '@/components/watch/ChannelModeIndicator';
 import LayoutSwitcher from '@/components/watch/LayoutSwitcher';
 import ScheduleSidebar from '@/components/watch/ScheduleSidebar';
 import {
@@ -96,7 +95,7 @@ const Watch = () => {
 
   return (
     <div className="h-screen flex flex-col bg-background overflow-hidden">
-      <Header onScheduleClick={() => setScheduleOpen(true)} />
+      <Header onScheduleClick={() => setScheduleOpen(true)} channelMode={mode} />
       
       {/* Schedule Sidebar */}
       <ScheduleSidebar 
@@ -107,14 +106,6 @@ const Watch = () => {
       
       {/* Main broadcast area - fills remaining height */}
       <div className="flex-1 flex flex-col min-h-0 p-4 gap-2">
-        {/* Channel mode indicator */}
-        <div className="flex-shrink-0 flex justify-between items-center">
-          <ChannelModeIndicator mode={mode} />
-          {isSchedulerLoading && (
-            <span className="text-xs text-muted-foreground">Loading...</span>
-          )}
-        </div>
-
         {/* Mode-specific layout */}
         {renderLayout(mode)}
 
