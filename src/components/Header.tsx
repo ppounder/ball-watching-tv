@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { Calendar } from 'lucide-react';
-import logo from '@/assets/bw-logo-text.png';
+import logo from '@/assets/bw-new-logo.png';
 import { Button } from '@/components/ui/button';
 import { ChannelMode } from '@/types/scheduler';
 import { cn } from '@/lib/utils';

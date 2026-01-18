@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Play, Radio, Trophy, Zap, ArrowRight } from 'lucide-react';
 import Header from '@/components/Header';
-import logo from '@/assets/bw-logo-text.png';
+import logo from '@/assets/bw-new-logo.png';
 
 const Index = () => {
   return (
