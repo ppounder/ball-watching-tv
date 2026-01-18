@@ -3,6 +3,7 @@ import Header from '@/components/Header';
 import LastUpdated from '@/components/watch/LastUpdated';
 import ChannelModeIndicator from '@/components/watch/ChannelModeIndicator';
 import LayoutSwitcher from '@/components/watch/LayoutSwitcher';
+import ScheduleSidebar from '@/components/watch/ScheduleSidebar';
 import {
   LiveLayout,
   MatchdayLayout,
@@ -25,6 +26,7 @@ const Watch = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isPolling, setIsPolling] = useState(false);
   const [overrideMode, setOverrideMode] = useState<ChannelMode | null>(null);
+  const [scheduleOpen, setScheduleOpen] = useState(false);
   
   const { mode: schedulerMode, bundle, isLoading: isSchedulerLoading } = useSchedulerState();
   
@@ -106,7 +108,14 @@ const Watch = () => {
 
   return (
     <div className="h-screen flex flex-col bg-background overflow-hidden">
-      <Header />
+      <Header onScheduleClick={() => setScheduleOpen(true)} />
+      
+      {/* Schedule Sidebar */}
+      <ScheduleSidebar 
+        open={scheduleOpen} 
+        onOpenChange={setScheduleOpen} 
+        bundle={bundle} 
+      />
       
       {/* Main broadcast area - fills remaining height */}
       <div className="flex-1 flex flex-col min-h-0 p-4 gap-2">
