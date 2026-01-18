@@ -1,7 +1,13 @@
 import { Link, useLocation } from 'react-router-dom';
+import { Calendar } from 'lucide-react';
 import logo from '@/assets/bw-logo-text.png';
+import { Button } from '@/components/ui/button';
 
-const Header = () => {
+interface HeaderProps {
+  onScheduleClick?: () => void;
+}
+
+const Header = ({ onScheduleClick }: HeaderProps) => {
   const location = useLocation();
   const isWatchPage = location.pathname === '/watch';
 
@@ -22,12 +28,26 @@ const Header = () => {
             </Link>
           )}
           {isWatchPage && (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-              </span>
-              Broadcasting
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                </span>
+                Broadcasting
+              </div>
+              
+              {onScheduleClick && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={onScheduleClick}
+                  className="gap-2"
+                >
+                  <Calendar className="w-4 h-4" />
+                  <span className="hidden sm:inline">Schedule</span>
+                </Button>
+              )}
             </div>
           )}
         </nav>
