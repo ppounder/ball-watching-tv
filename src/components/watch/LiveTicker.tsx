@@ -12,7 +12,8 @@ const parseGoalTime = (time: string): number => {
 };
 
 // Check if a goal is an own goal
-const isOwnGoal = (player: string): boolean => {
+const isOwnGoal = (player: string | null | undefined): boolean => {
+  if (!player) return false;
   return player.toLowerCase().includes('(og)') || player.toLowerCase().includes('own goal');
 };
 
