@@ -11,16 +11,22 @@ const parseGoalTime = (time: string): number => {
   return base + extra;
 };
 
+// Check if a goal is an own goal
+const isOwnGoal = (player: string): boolean => {
+  return player.toLowerCase().includes('(og)') || player.toLowerCase().includes('own goal');
+};
+
 // Find the latest goal scorer for a fixture
+// For own goals, the team that benefits is the OPPOSING team to the scorer
 const findLatestGoal = (fixture: TickerFixture): { team: 'home' | 'away' | null; player: string; time: string } | null => {
   let latestTime = 0;
-  let latestGoal: { team: 'home' | 'away'; player: string; time: string } | null = null;
+  let latestGoal: { team: 'home' | 'away'; player: string; time: string; isOG: boolean } | null = null;
 
   for (const goal of fixture.homeGoalscorers) {
     const time = parseGoalTime(goal.time);
     if (time > latestTime) {
       latestTime = time;
-      latestGoal = { team: 'home', player: goal.player, time: goal.time };
+      latestGoal = { team: 'home', player: goal.player, time: goal.time, isOG: isOwnGoal(goal.player) };
     }
   }
 
@@ -28,11 +34,20 @@ const findLatestGoal = (fixture: TickerFixture): { team: 'home' | 'away' | null;
     const time = parseGoalTime(goal.time);
     if (time > latestTime) {
       latestTime = time;
-      latestGoal = { team: 'away', player: goal.player, time: goal.time };
+      latestGoal = { team: 'away', player: goal.player, time: goal.time, isOG: isOwnGoal(goal.player) };
     }
   }
 
-  return latestGoal;
+  if (!latestGoal) return null;
+
+  // For own goals, the beneficiary is the opposing team
+  // If goal is in homeGoalscorers with (OG), the home team "scored" it but away benefits
+  // If goal is in awayGoalscorers with (OG), the away team "scored" it but home benefits
+  const beneficiaryTeam = latestGoal.isOG 
+    ? (latestGoal.team === 'home' ? 'away' : 'home')
+    : latestGoal.team;
+
+  return { team: beneficiaryTeam, player: latestGoal.player, time: latestGoal.time };
 };
 
 const LiveTicker = () => {
