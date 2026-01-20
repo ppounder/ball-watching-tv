@@ -236,24 +236,18 @@ const LiveScores = () => {
     return status === 'LIVE' || status === '1H' || status === '2H' || status === 'ET';
   };
 
-  // Get left column display (kickoff time for all, status for HT/FT)
+  // Get left column display (always kickoff time)
   const getLeftDisplay = (fixture: Fixture) => {
-    const status = fixture.status_short;
     const kickoff = new Date(fixture.kickoff_utc);
     const timeStr = format(kickoff, 'HH:mm');
-    
-    if (status === 'HT') {
-      return <span className="text-xs font-semibold text-amber-500">HT</span>;
-    }
-    if (status === 'FT') {
-      return <span className="text-xs font-semibold text-muted-foreground">FT</span>;
-    }
-    // For NS and live games, show kickoff time
     return <span className="text-xs text-muted-foreground">{timeStr}</span>;
   };
 
-  // Get right column display (elapsed time for live games)
+  // Get right column display (elapsed time for live, status for HT/FT/PST/CANC/SUSP)
   const getRightDisplay = (fixture: Fixture) => {
+    const status = fixture.status_short;
+    
+    // Live games show pulsing elapsed time
     if (isLive(fixture)) {
       const elapsed = getElapsedDisplay(fixture);
       return (
@@ -262,7 +256,23 @@ const LiveScores = () => {
         </span>
       );
     }
-    // Nothing on right for non-live games
+    
+    // Half time - amber color
+    if (status === 'HT') {
+      return <span className="text-xs font-semibold text-amber-500">HT</span>;
+    }
+    
+    // Full time - muted color
+    if (status === 'FT') {
+      return <span className="text-xs text-muted-foreground">FT</span>;
+    }
+    
+    // Postponed, Cancelled, Suspended - muted color (same as kickoff time)
+    if (status === 'PST' || status === 'CANC' || status === 'SUSP') {
+      return <span className="text-xs text-muted-foreground">{status}</span>;
+    }
+    
+    // Nothing on right for NS (not started) games
     return null;
   };
 
