@@ -12,6 +12,7 @@ interface Fixture {
   status_short: string;
   status_long: string;
   elapsed: number | null;
+  extra: number | null;
   home_team_name: string;
   home_team_logo: string;
   home_goals: number | null;
@@ -176,31 +177,50 @@ const LiveScores = () => {
     return teamName.substring(0, 3).toUpperCase();
   };
 
-  const getStatusDisplay = (fixture: Fixture) => {
-    const status = fixture.status_short;
+  // Get elapsed time display with extra time if applicable
+  const getElapsedDisplay = (fixture: Fixture) => {
+    if (!fixture.elapsed) return null;
     
-    if (status === 'LIVE' || status === '1H' || status === '2H') {
-      return (
-        <span className="text-xs font-bold text-red-500 animate-pulse">
-          {fixture.elapsed ? `${fixture.elapsed}'` : 'LIVE'}
-        </span>
-      );
+    if (fixture.extra && fixture.extra > 0) {
+      return `${fixture.elapsed}+${fixture.extra}'`;
     }
+    return `${fixture.elapsed}'`;
+  };
+
+  // Check if fixture is currently live/in-play
+  const isLive = (fixture: Fixture) => {
+    const status = fixture.status_short;
+    return status === 'LIVE' || status === '1H' || status === '2H' || status === 'ET';
+  };
+
+  // Get left column display (kickoff time for all, status for HT/FT)
+  const getLeftDisplay = (fixture: Fixture) => {
+    const status = fixture.status_short;
+    const kickoff = new Date(fixture.kickoff_utc);
+    const timeStr = format(kickoff, 'HH:mm');
+    
     if (status === 'HT') {
       return <span className="text-xs font-semibold text-amber-500">HT</span>;
     }
     if (status === 'FT') {
       return <span className="text-xs font-semibold text-muted-foreground">FT</span>;
     }
-    if (status === 'NS') {
-      const kickoff = new Date(fixture.kickoff_utc);
+    // For NS and live games, show kickoff time
+    return <span className="text-xs text-muted-foreground">{timeStr}</span>;
+  };
+
+  // Get right column display (elapsed time for live games)
+  const getRightDisplay = (fixture: Fixture) => {
+    if (isLive(fixture)) {
+      const elapsed = getElapsedDisplay(fixture);
       return (
-        <span className="text-xs text-muted-foreground">
-          {format(kickoff, 'HH:mm')}
+        <span className="text-xs font-bold text-red-500 animate-pulse">
+          {elapsed || 'LIVE'}
         </span>
       );
     }
-    return <span className="text-xs text-muted-foreground">{status}</span>;
+    // Nothing on right for non-live games
+    return null;
   };
 
   if (isLoading) {
@@ -263,9 +283,9 @@ const LiveScores = () => {
             className="px-3 py-1.5 border-b border-border/50 hover:bg-secondary/20 transition-colors"
           >
             <div className="flex items-center text-xs">
-              {/* Status/Time */}
+              {/* Left: Kickoff time or status (HT/FT) */}
               <div className="w-12 flex-shrink-0 text-center">
-                {getStatusDisplay(fixture)}
+                {getLeftDisplay(fixture)}
               </div>
 
               {/* Match info - centered and spread */}
@@ -308,9 +328,9 @@ const LiveScores = () => {
                 </div>
               </div>
 
-              {/* Kickoff time on right (for context when not started) */}
-              <div className="w-12 flex-shrink-0 text-right text-muted-foreground">
-                {fixture.status_short === 'NS' ? '' : format(new Date(fixture.kickoff_utc), 'HH:mm')}
+              {/* Right: Pulsing elapsed time for live games */}
+              <div className="w-14 flex-shrink-0 text-right">
+                {getRightDisplay(fixture)}
               </div>
             </div>
           </div>
