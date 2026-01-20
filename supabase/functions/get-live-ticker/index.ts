@@ -20,7 +20,7 @@ interface Fixture {
 
 interface FixtureEvent {
   type: string;
-  time: number;
+  minute: number;
   extra_time: number | null;
   team_id: number;
   player_name: string;
@@ -169,8 +169,8 @@ serve(async (req) => {
 
         for (const event of events) {
           const timeDisplay = event.extra_time 
-            ? `${event.time}+${event.extra_time}'` 
-            : `${event.time}'`;
+            ? `${event.minute}+${event.extra_time}'` 
+            : `${event.minute}'`;
 
           const isHomeTeam = event.team_id === fixture.home_team_id;
 
@@ -222,7 +222,7 @@ serve(async (req) => {
 
         tickerCompetitions.push({
           competitionId,
-          competitionName,
+          competitionName: competitionName.toUpperCase(),
           fixtures: tickerFixtures,
         });
       }
