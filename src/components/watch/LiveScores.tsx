@@ -51,7 +51,16 @@ const LiveScores = () => {
       }
 
       const response = data as TodaysFixturesResponse;
-      setLeagues(response.leagues || []);
+      
+      // Sort fixtures within each league alphabetically by home team name
+      const sortedLeagues = (response.leagues || []).map(league => ({
+        ...league,
+        fixtures: [...league.fixtures].sort((a, b) => 
+          a.home_team_name.localeCompare(b.home_team_name)
+        )
+      }));
+      
+      setLeagues(sortedLeagues);
       setError(null);
     } catch (err) {
       console.error('Error fetching fixtures:', err);
