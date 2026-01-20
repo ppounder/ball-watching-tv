@@ -12,7 +12,7 @@ interface Fixture {
   status_short: string;
   status_long: string;
   elapsed: number | null;
-  extra: number | null;
+  status_extra: number | null;
   home_team_name: string;
   home_team_logo: string;
   home_goals: number | null;
@@ -224,8 +224,8 @@ const LiveScores = () => {
   const getElapsedDisplay = (fixture: Fixture) => {
     if (!fixture.elapsed) return null;
     
-    if (fixture.extra && fixture.extra > 0) {
-      return `${fixture.elapsed}+${fixture.extra}'`;
+    if (fixture.status_extra && fixture.status_extra > 0) {
+      return `${fixture.elapsed}+${fixture.status_extra}'`;
     }
     return `${fixture.elapsed}'`;
   };
