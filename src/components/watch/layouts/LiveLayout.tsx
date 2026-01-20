@@ -4,7 +4,7 @@ import StreamEmbed from '@/components/watch/StreamEmbed';
 import BroadcastHeader from '@/components/watch/BroadcastHeader';
 import LiveScores from '@/components/watch/LiveScores';
 import ScheduleFixtures from '@/components/watch/ScheduleFixtures';
-import Ticker from '@/components/watch/Ticker';
+import LiveTicker from '@/components/watch/LiveTicker';
 import Vidiprinter from '@/components/watch/Vidiprinter';
 import AdPanel from '@/components/watch/AdPanel';
 import UpNext from '@/components/watch/UpNext';
@@ -76,9 +76,9 @@ const LiveLayout = ({ alerts, isLoading, bundle, currentItem, nextItem }: LiveLa
       {/* Up Next strip */}
       {nextItem && <UpNext nextItem={nextItem} />}
 
-      {/* Ticker - Full width */}
+      {/* Live Ticker - Full width with logo, time, and scrolling scores */}
       <div className="flex-shrink-0">
-        <Ticker alerts={alerts} />
+        <LiveTicker />
       </div>
 
       {/* Vidiprinter + Ad Panel - Same layout as stream + scores */}
