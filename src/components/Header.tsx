@@ -28,7 +28,7 @@ const Header = ({ onScheduleClick, channelMode }: HeaderProps) => {
 
   return (
     <header className="sticky top-0 z-50 glass border-b border-border/50">
-      <div className="container mx-auto px-4 h-14 flex items-center justify-between">
+      <div className="w-full px-4 h-14 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
           <img src={logo} alt="Ball Watching" className="h-8 w-auto" />
         </Link>
