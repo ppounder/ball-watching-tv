@@ -27,6 +27,17 @@ interface LeagueFixtures {
   fixtures: Fixture[];
 }
 
+interface SlideData {
+  leagueId: string;
+  leagueName: string;
+  fixtures: Fixture[];
+  pageNumber?: number;
+  totalPages?: number;
+}
+
+const MAX_FIXTURES_PER_SLIDE = 12;
+const CUP_COMPETITION_IDS = [45, 46, 48];
+
 interface TodaysFixturesResponse {
   leagues: LeagueFixtures[];
   date: string;
@@ -62,6 +73,8 @@ const LiveScores = () => {
       }));
       
       setLeagues(sortedLeagues);
+      // Reset to first slide when data changes
+      setCurrentLeagueIndex(0);
       setError(null);
     } catch (err) {
       console.error('Error fetching fixtures:', err);
@@ -80,18 +93,48 @@ const LiveScores = () => {
     return () => clearInterval(refreshInterval);
   }, [fetchFixtures]);
 
-  // Rotate through leagues
+  // Create slides - split cup competitions with more than 12 fixtures
+  const slides: SlideData[] = leagues.flatMap(league => {
+    const leagueIdNum = parseInt(league.leagueId, 10);
+    const isCupCompetition = CUP_COMPETITION_IDS.includes(leagueIdNum);
+    
+    // Only paginate cup competitions with more than 12 fixtures
+    if (isCupCompetition && league.fixtures.length > MAX_FIXTURES_PER_SLIDE) {
+      const totalPages = Math.ceil(league.fixtures.length / MAX_FIXTURES_PER_SLIDE);
+      const pages: SlideData[] = [];
+      
+      for (let i = 0; i < totalPages; i++) {
+        pages.push({
+          leagueId: league.leagueId,
+          leagueName: league.leagueName,
+          fixtures: league.fixtures.slice(i * MAX_FIXTURES_PER_SLIDE, (i + 1) * MAX_FIXTURES_PER_SLIDE),
+          pageNumber: i + 1,
+          totalPages
+        });
+      }
+      return pages;
+    }
+    
+    // Non-cup or under 12 fixtures - single slide
+    return [{
+      leagueId: league.leagueId,
+      leagueName: league.leagueName,
+      fixtures: league.fixtures
+    }];
+  });
+
+  // Rotate through slides
   useEffect(() => {
-    if (leagues.length <= 1) return;
+    if (slides.length <= 1) return;
 
     const rotationInterval = setInterval(() => {
-      setCurrentLeagueIndex((prev) => (prev + 1) % leagues.length);
+      setCurrentLeagueIndex((prev) => (prev + 1) % slides.length);
     }, ROTATION_INTERVAL);
 
     return () => clearInterval(rotationInterval);
-  }, [leagues.length]);
+  }, [slides.length]);
 
-  const currentLeague = leagues[currentLeagueIndex];
+  const currentSlide = slides[currentLeagueIndex];
 
   // Get 3-letter abbreviation for team name
   const getTeamAbbr = (teamName: string): string => {
@@ -250,10 +293,10 @@ const LiveScores = () => {
           Today's Games
         </h2>
         
-        {/* League pagination dots */}
-        {leagues.length > 1 && (
+        {/* Slide pagination dots */}
+        {slides.length > 1 && (
           <div className="flex items-center gap-1">
-            {leagues.map((_, idx) => (
+            {slides.map((_, idx) => (
               <button
                 key={idx}
                 onClick={() => setCurrentLeagueIndex(idx)}
@@ -268,19 +311,24 @@ const LiveScores = () => {
         )}
       </div>
 
-      {/* Current league name */}
-      <div className="px-4 py-2 bg-secondary/30 border-b border-border/50">
+      {/* Current league name with page indicator for paginated cups */}
+      <div className="px-4 py-2 bg-secondary/30 border-b border-border/50 flex items-center justify-between">
         <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-          {currentLeague?.leagueName}
+          {currentSlide?.leagueName}
         </h3>
+        {currentSlide?.totalPages && (
+          <span className="text-xs text-muted-foreground/60">
+            {currentSlide.pageNumber}/{currentSlide.totalPages}
+          </span>
+        )}
       </div>
 
       {/* Fixtures list - compact single line format */}
       <div className="flex-1 overflow-y-auto">
-        {currentLeague?.fixtures.map((fixture) => (
+        {currentSlide?.fixtures.map((fixture) => (
           <div
             key={fixture.fixture_id}
-            className="px-3 py-1.5 border-b border-border/50 hover:bg-secondary/20 transition-colors"
+            className="px-3 py-2.5 border-b border-border/50 hover:bg-secondary/20 transition-colors"
           >
             <div className="flex items-center text-xs">
               {/* Left: Kickoff time or status (HT/FT) */}
@@ -338,11 +386,11 @@ const LiveScores = () => {
       </div>
 
       {/* Footer with rotation indicator */}
-      {leagues.length > 1 && (
+      {slides.length > 1 && (
         <div className="px-4 py-2 border-t border-border bg-secondary/20">
           <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground">
             <Clock className="w-3 h-3" />
-            <span>{currentLeagueIndex + 1} of {leagues.length} leagues</span>
+            <span>{currentLeagueIndex + 1} of {slides.length}</span>
           </div>
         </div>
       )}
