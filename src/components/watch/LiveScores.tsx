@@ -92,6 +92,90 @@ const LiveScores = () => {
 
   const currentLeague = leagues[currentLeagueIndex];
 
+  // Get 3-letter abbreviation for team name
+  const getTeamAbbr = (teamName: string): string => {
+    // Common abbreviations for well-known teams
+    const abbreviations: Record<string, string> = {
+      'Arsenal': 'ARS',
+      'Aston Villa': 'AVL',
+      'Bournemouth': 'BOU',
+      'Brentford': 'BRE',
+      'Brighton': 'BHA',
+      'Brighton & Hove Albion': 'BHA',
+      'Chelsea': 'CHE',
+      'Crystal Palace': 'CRY',
+      'Everton': 'EVE',
+      'Fulham': 'FUL',
+      'Ipswich': 'IPS',
+      'Ipswich Town': 'IPS',
+      'Leicester': 'LEI',
+      'Leicester City': 'LEI',
+      'Liverpool': 'LIV',
+      'Manchester City': 'MCI',
+      'Manchester United': 'MUN',
+      'Newcastle': 'NEW',
+      'Newcastle United': 'NEW',
+      'Nottingham Forest': 'NFO',
+      'Southampton': 'SOU',
+      'Tottenham': 'TOT',
+      'Tottenham Hotspur': 'TOT',
+      'West Ham': 'WHU',
+      'West Ham United': 'WHU',
+      'Wolverhampton': 'WOL',
+      'Wolves': 'WOL',
+      'Wolverhampton Wanderers': 'WOL',
+      // Championship
+      'Birmingham': 'BIR',
+      'Birmingham City': 'BIR',
+      'Blackburn': 'BLA',
+      'Blackburn Rovers': 'BLA',
+      'Bristol City': 'BRC',
+      'Burnley': 'BUR',
+      'Cardiff': 'CAR',
+      'Cardiff City': 'CAR',
+      'Coventry': 'COV',
+      'Coventry City': 'COV',
+      'Derby': 'DER',
+      'Derby County': 'DER',
+      'Hull': 'HUL',
+      'Hull City': 'HUL',
+      'Leeds': 'LEE',
+      'Leeds United': 'LEE',
+      'Luton': 'LUT',
+      'Luton Town': 'LUT',
+      'Middlesbrough': 'MID',
+      'Millwall': 'MIL',
+      'Norwich': 'NOR',
+      'Norwich City': 'NOR',
+      'Oxford': 'OXF',
+      'Oxford United': 'OXF',
+      'Plymouth': 'PLY',
+      'Plymouth Argyle': 'PLY',
+      'Portsmouth': 'POR',
+      'Preston': 'PNE',
+      'Preston North End': 'PNE',
+      'QPR': 'QPR',
+      'Queens Park Rangers': 'QPR',
+      'Sheffield United': 'SHU',
+      'Sheffield Wednesday': 'SHW',
+      'Stoke': 'STK',
+      'Stoke City': 'STK',
+      'Sunderland': 'SUN',
+      'Swansea': 'SWA',
+      'Swansea City': 'SWA',
+      'Watford': 'WAT',
+      'West Brom': 'WBA',
+      'West Bromwich Albion': 'WBA',
+    };
+    
+    if (abbreviations[teamName]) {
+      return abbreviations[teamName];
+    }
+    
+    // Fallback: take first 3 letters (uppercase)
+    return teamName.substring(0, 3).toUpperCase();
+  };
+
   const getStatusDisplay = (fixture: Fixture) => {
     const status = fixture.status_short;
     
@@ -171,57 +255,35 @@ const LiveScores = () => {
         </h3>
       </div>
 
-      {/* Fixtures list */}
+      {/* Fixtures list - compact single line format */}
       <div className="flex-1 overflow-y-auto">
         {currentLeague?.fixtures.map((fixture) => (
           <div
             key={fixture.fixture_id}
-            className="px-4 py-2.5 border-b border-border/50 hover:bg-secondary/20 transition-colors"
+            className="px-3 py-1.5 border-b border-border/50 hover:bg-secondary/20 transition-colors"
           >
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 text-xs">
               {/* Status/Time */}
               <div className="w-10 flex-shrink-0 text-center">
                 {getStatusDisplay(fixture)}
               </div>
 
-              {/* Teams and Score */}
-              <div className="flex-1 min-w-0">
-                {/* Home team */}
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2 min-w-0 flex-1">
-                    <img
-                      src={fixture.home_team_logo}
-                      alt={fixture.home_team_name}
-                      className="w-4 h-4 object-contain flex-shrink-0"
-                      onError={(e) => {
-                        e.currentTarget.src = '/placeholder.svg';
-                      }}
-                    />
-                    <span className="text-sm truncate">{fixture.home_team_name}</span>
-                  </div>
-                  <span className="text-sm font-semibold w-6 text-right">
-                    {fixture.home_goals !== null ? fixture.home_goals : '-'}
-                  </span>
-                </div>
+              {/* Home Team Abbr */}
+              <span className="font-medium w-8 text-right" title={fixture.home_team_name}>
+                {getTeamAbbr(fixture.home_team_name)}
+              </span>
 
-                {/* Away team */}
-                <div className="flex items-center justify-between gap-2 mt-1">
-                  <div className="flex items-center gap-2 min-w-0 flex-1">
-                    <img
-                      src={fixture.away_team_logo}
-                      alt={fixture.away_team_name}
-                      className="w-4 h-4 object-contain flex-shrink-0"
-                      onError={(e) => {
-                        e.currentTarget.src = '/placeholder.svg';
-                      }}
-                    />
-                    <span className="text-sm truncate">{fixture.away_team_name}</span>
-                  </div>
-                  <span className="text-sm font-semibold w-6 text-right">
-                    {fixture.away_goals !== null ? fixture.away_goals : '-'}
-                  </span>
-                </div>
-              </div>
+              {/* Score */}
+              <span className="font-bold text-center w-10">
+                {fixture.home_goals !== null && fixture.away_goals !== null
+                  ? `${fixture.home_goals}-${fixture.away_goals}`
+                  : 'v'}
+              </span>
+
+              {/* Away Team Abbr */}
+              <span className="font-medium w-8 text-left" title={fixture.away_team_name}>
+                {getTeamAbbr(fixture.away_team_name)}
+              </span>
             </div>
           </div>
         ))}
