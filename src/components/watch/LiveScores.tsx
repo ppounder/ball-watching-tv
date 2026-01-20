@@ -262,28 +262,56 @@ const LiveScores = () => {
             key={fixture.fixture_id}
             className="px-3 py-1.5 border-b border-border/50 hover:bg-secondary/20 transition-colors"
           >
-            <div className="flex items-center gap-2 text-xs">
+            <div className="flex items-center text-xs">
               {/* Status/Time */}
-              <div className="w-10 flex-shrink-0 text-center">
+              <div className="w-12 flex-shrink-0 text-center">
                 {getStatusDisplay(fixture)}
               </div>
 
-              {/* Home Team Abbr */}
-              <span className="font-medium w-8 text-right" title={fixture.home_team_name}>
-                {getTeamAbbr(fixture.home_team_name)}
-              </span>
+              {/* Match info - centered and spread */}
+              <div className="flex-1 flex items-center justify-center gap-2">
+                {/* Home Team: Logo + Abbr */}
+                <div className="flex items-center gap-1.5 justify-end min-w-[60px]">
+                  <img
+                    src={fixture.home_team_logo}
+                    alt={fixture.home_team_name}
+                    className="w-4 h-4 object-contain flex-shrink-0"
+                    onError={(e) => {
+                      e.currentTarget.src = '/placeholder.svg';
+                    }}
+                  />
+                  <span className="font-medium" title={fixture.home_team_name}>
+                    {getTeamAbbr(fixture.home_team_name)}
+                  </span>
+                </div>
 
-              {/* Score */}
-              <span className="font-bold text-center w-10">
-                {fixture.home_goals !== null && fixture.away_goals !== null
-                  ? `${fixture.home_goals}-${fixture.away_goals}`
-                  : 'v'}
-              </span>
+                {/* Score */}
+                <span className="font-bold text-center min-w-[36px]">
+                  {fixture.home_goals !== null && fixture.away_goals !== null
+                    ? `${fixture.home_goals} - ${fixture.away_goals}`
+                    : 'v'}
+                </span>
 
-              {/* Away Team Abbr */}
-              <span className="font-medium w-8 text-left" title={fixture.away_team_name}>
-                {getTeamAbbr(fixture.away_team_name)}
-              </span>
+                {/* Away Team: Abbr + Logo */}
+                <div className="flex items-center gap-1.5 justify-start min-w-[60px]">
+                  <span className="font-medium" title={fixture.away_team_name}>
+                    {getTeamAbbr(fixture.away_team_name)}
+                  </span>
+                  <img
+                    src={fixture.away_team_logo}
+                    alt={fixture.away_team_name}
+                    className="w-4 h-4 object-contain flex-shrink-0"
+                    onError={(e) => {
+                      e.currentTarget.src = '/placeholder.svg';
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Kickoff time on right (for context when not started) */}
+              <div className="w-12 flex-shrink-0 text-right text-muted-foreground">
+                {fixture.status_short === 'NS' ? '' : format(new Date(fixture.kickoff_utc), 'HH:mm')}
+              </div>
             </div>
           </div>
         ))}
