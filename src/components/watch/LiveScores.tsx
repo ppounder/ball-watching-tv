@@ -27,6 +27,11 @@ interface LeagueFixtures {
   fixtures: Fixture[];
 }
 
+// Helper to get competition logo URL from storage
+const getCompetitionLogoUrl = (competitionId: string | number): string => {
+  return `https://pwpewpymzibnewdosxiq.supabase.co/storage/v1/object/public/ball-watching/competitions/${competitionId}.svg`;
+};
+
 interface SlideData {
   leagueId: string;
   leagueName: string;
@@ -323,7 +328,17 @@ const LiveScores = () => {
 
       {/* Current league name with page indicator for paginated cups */}
       <div className="px-4 py-2 bg-secondary/30 border-b border-border/50 flex items-center justify-between">
-        <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+        <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-2">
+          {currentSlide && (
+            <img
+              src={getCompetitionLogoUrl(currentSlide.leagueId)}
+              alt=""
+              className="w-4 h-4 object-contain"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+              }}
+            />
+          )}
           {currentSlide?.leagueName}
         </h3>
         {currentSlide?.totalPages && (
