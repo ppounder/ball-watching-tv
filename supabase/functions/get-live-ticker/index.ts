@@ -202,6 +202,11 @@ serve(async (req) => {
           }
         }
 
+        // Skip postponed fixtures
+        if (fixture.status_short === 'PST') {
+          continue;
+        }
+
         tickerFixtures.push({
           fixtureId: fixture.fixture_id,
           homeTeam: fixture.home_team_name,
