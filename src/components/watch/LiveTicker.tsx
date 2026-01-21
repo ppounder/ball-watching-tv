@@ -149,26 +149,32 @@ const LiveTicker = () => {
       return <span>Waiting for match updates...</span>;
     }
 
-    return competitions.map((competition, compIdx) => (
-      <span key={competition.competitionId} className="inline-flex items-center">
-        {compIdx > 0 && <span className="mx-6 text-muted-foreground">•</span>}
-        <img
-          src={getCompetitionLogoUrl(competition.competitionId)}
-          alt=""
-          className="w-4 h-4 object-contain mr-1.5"
-          onError={(e) => {
-            e.currentTarget.style.display = 'none';
-          }}
-        />
-        <span className="font-semibold mr-2">{competition.competitionName}:</span>
-        {competition.fixtures.map((fixture, fixIdx) => (
-          <span key={fixture.fixtureId} className="inline-flex items-center">
-            {fixIdx > 0 && <span className="mx-3 text-muted-foreground">|</span>}
-            {formatFixture(fixture)}
+    return (
+      <>
+        {competitions.map((competition, compIdx) => (
+          <span key={competition.competitionId} className="inline-flex items-center">
+            {compIdx > 0 && <span className="mx-6 text-muted-foreground">•</span>}
+            <img
+              src={getCompetitionLogoUrl(competition.competitionId)}
+              alt=""
+              className="w-4 h-4 object-contain mr-1.5"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+              }}
+            />
+            <span className="font-semibold mr-2">{competition.competitionName}:</span>
+            {competition.fixtures.map((fixture, fixIdx) => (
+              <span key={fixture.fixtureId} className="inline-flex items-center">
+                {fixIdx > 0 && <span className="mx-3 text-muted-foreground">|</span>}
+                {formatFixture(fixture)}
+              </span>
+            ))}
           </span>
         ))}
-      </span>
-    ));
+        {/* Trailing separator for seamless loop */}
+        <span className="mx-6 text-muted-foreground">•</span>
+      </>
+    );
   }, [competitions]);
 
   // Smooth scrolling animation
