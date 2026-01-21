@@ -2,6 +2,11 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { useLiveTicker, TickerCompetition, TickerFixture } from '@/hooks/useLiveTicker';
 import bwLogo from '@/assets/bw-new-logo.png';
 
+// Helper to get competition logo URL from storage
+const getCompetitionLogoUrl = (competitionId: string | number): string => {
+  return `https://pwpewpymzibnewdosxiq.supabase.co/storage/v1/object/public/ball-watching/competitions/${competitionId}.svg`;
+};
+
 // Parse goal time to a comparable number (e.g., "45+2'" -> 47, "90'" -> 90)
 const parseGoalTime = (time: string): number => {
   const match = time.match(/(\d+)(?:\+(\d+))?/);
@@ -147,6 +152,14 @@ const LiveTicker = () => {
     return competitions.map((competition, compIdx) => (
       <span key={competition.competitionId} className="inline-flex items-center">
         {compIdx > 0 && <span className="mx-6 text-muted-foreground">•</span>}
+        <img
+          src={getCompetitionLogoUrl(competition.competitionId)}
+          alt=""
+          className="w-4 h-4 object-contain mr-1.5"
+          onError={(e) => {
+            e.currentTarget.style.display = 'none';
+          }}
+        />
         <span className="font-semibold mr-2">{competition.competitionName}:</span>
         {competition.fixtures.map((fixture, fixIdx) => (
           <span key={fixture.fixtureId} className="inline-flex items-center">
