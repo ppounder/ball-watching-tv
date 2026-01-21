@@ -29,9 +29,27 @@ const Header = ({ onScheduleClick, channelMode }: HeaderProps) => {
   return (
     <header className="sticky top-0 z-50 glass border-b border-border/50">
       <div className="w-full px-4 h-14 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2">
-          <img src={logo} alt="Ball Watching" className="h-8 w-auto" />
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link to="/" className="flex items-center gap-2">
+            <img src={logo} alt="Ball Watching" className="h-8 w-auto" />
+          </Link>
+          
+          {isWatchPage && channelMode && (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span className="relative flex h-2 w-2">
+                <span className={cn(
+                  "animate-ping absolute inline-flex h-full w-full rounded-full opacity-75",
+                  config.colorClass
+                )}></span>
+                <span className={cn(
+                  "relative inline-flex rounded-full h-2 w-2",
+                  config.colorClass
+                )}></span>
+              </span>
+              {config.label}
+            </div>
+          )}
+        </div>
 
         <nav className="flex items-center gap-4">
           {!isWatchPage && (
@@ -42,34 +60,16 @@ const Header = ({ onScheduleClick, channelMode }: HeaderProps) => {
               Watch Live
             </Link>
           )}
-          {isWatchPage && (
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <span className="relative flex h-2 w-2">
-                  <span className={cn(
-                    "animate-ping absolute inline-flex h-full w-full rounded-full opacity-75",
-                    config.colorClass
-                  )}></span>
-                  <span className={cn(
-                    "relative inline-flex rounded-full h-2 w-2",
-                    config.colorClass
-                  )}></span>
-                </span>
-                {config.label}
-              </div>
-              
-              {onScheduleClick && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={onScheduleClick}
-                  className="gap-2"
-                >
-                  <Calendar className="w-4 h-4" />
-                  <span className="hidden sm:inline">Schedule</span>
-                </Button>
-              )}
-            </div>
+          {isWatchPage && onScheduleClick && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onScheduleClick}
+              className="gap-2"
+            >
+              <Calendar className="w-4 h-4" />
+              <span className="hidden sm:inline">Schedule</span>
+            </Button>
           )}
         </nav>
       </div>
