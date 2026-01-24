@@ -109,6 +109,9 @@ serve(async (req) => {
         }
       }
 
+      // Deduplicate fixture IDs to handle any duplicate entries in the set
+      fixtureIds = [...new Set(fixtureIds)];
+
       if (fixtureIds.length === 0) {
         console.log(`Empty fixture set for ${leagueName}`);
         continue;
