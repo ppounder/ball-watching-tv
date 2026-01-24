@@ -149,8 +149,8 @@ serve(async (req) => {
       }
     }
 
-    // Sort leagues alphabetically
-    leagueFixtures.sort((a, b) => a.leagueName.localeCompare(b.leagueName));
+    // Sort leagues by competition ID (numeric order)
+    leagueFixtures.sort((a, b) => parseInt(a.leagueId, 10) - parseInt(b.leagueId, 10));
 
     console.log(`Returning ${leagueFixtures.length} leagues with fixtures`);
 
