@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Trophy, Clock, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
@@ -99,55 +99,71 @@ const LiveScores = () => {
   }, [fetchFixtures]);
 
   // Create slides - split cup competitions with more than 12 fixtures
-  const slides: SlideData[] = leagues.flatMap(league => {
-    const leagueIdNum = parseInt(league.leagueId, 10);
-    const isCupCompetition = CUP_COMPETITION_IDS.includes(leagueIdNum);
-    
-    // Only paginate cup competitions with more than 12 fixtures
-    if (isCupCompetition && league.fixtures.length > MAX_FIXTURES_PER_SLIDE) {
-      const totalPages = Math.ceil(league.fixtures.length / MAX_FIXTURES_PER_SLIDE);
-      const pages: SlideData[] = [];
+  const slides: SlideData[] = useMemo(() => {
+    return leagues.flatMap(league => {
+      const leagueIdNum = parseInt(league.leagueId, 10);
+      const isCupCompetition = CUP_COMPETITION_IDS.includes(leagueIdNum);
       
-      for (let i = 0; i < totalPages; i++) {
-        pages.push({
-          leagueId: league.leagueId,
-          leagueName: league.leagueName,
-          fixtures: league.fixtures.slice(i * MAX_FIXTURES_PER_SLIDE, (i + 1) * MAX_FIXTURES_PER_SLIDE),
-          pageNumber: i + 1,
-          totalPages
-        });
+      // Only paginate cup competitions with more than 12 fixtures
+      if (isCupCompetition && league.fixtures.length > MAX_FIXTURES_PER_SLIDE) {
+        const totalPages = Math.ceil(league.fixtures.length / MAX_FIXTURES_PER_SLIDE);
+        const pages: SlideData[] = [];
+        
+        for (let i = 0; i < totalPages; i++) {
+          pages.push({
+            leagueId: league.leagueId,
+            leagueName: league.leagueName,
+            fixtures: league.fixtures.slice(i * MAX_FIXTURES_PER_SLIDE, (i + 1) * MAX_FIXTURES_PER_SLIDE),
+            pageNumber: i + 1,
+            totalPages
+          });
+        }
+        return pages;
       }
-      return pages;
-    }
-    
-    // Non-cup or under 12 fixtures - single slide
-    return [{
-      leagueId: league.leagueId,
-      leagueName: league.leagueName,
-      fixtures: league.fixtures
-    }];
-  });
+      
+      // Non-cup or under 12 fixtures - single slide
+      return [{
+        leagueId: league.leagueId,
+        leagueName: league.leagueName,
+        fixtures: league.fixtures
+      }];
+    });
+  }, [leagues]);
+
+  // Use a ref to always have access to current slides length in interval callback
+  const slidesLengthRef = useRef(slides.length);
+  useEffect(() => {
+    slidesLengthRef.current = slides.length;
+  }, [slides.length]);
 
   // Ensure currentLeagueIndex is valid when slides change
   useEffect(() => {
-    if (currentLeagueIndex >= slides.length && slides.length > 0) {
+    if (slides.length > 0 && currentLeagueIndex >= slides.length) {
       setCurrentLeagueIndex(0);
     }
   }, [slides.length, currentLeagueIndex]);
 
-  // Rotate through slides
+  // Rotate through slides using ref to avoid stale closure
   useEffect(() => {
     if (slides.length <= 1) return;
 
     const rotationInterval = setInterval(() => {
-      setCurrentLeagueIndex((prev) => (prev + 1) % slides.length);
+      setCurrentLeagueIndex((prev) => {
+        const len = slidesLengthRef.current;
+        if (len <= 1) return 0;
+        return (prev + 1) % len;
+      });
     }, ROTATION_INTERVAL);
 
     return () => clearInterval(rotationInterval);
   }, [slides.length]);
 
   // Safely get current slide with bounds check
-  const currentSlide = slides.length > 0 ? slides[Math.min(currentLeagueIndex, slides.length - 1)] : null;
+  const currentSlide = useMemo(() => {
+    if (slides.length === 0) return null;
+    const safeIndex = Math.min(currentLeagueIndex, slides.length - 1);
+    return slides[safeIndex];
+  }, [slides, currentLeagueIndex]);
 
   // Get 3-letter abbreviation for team name
   const getTeamAbbr = (teamName: string): string => {
