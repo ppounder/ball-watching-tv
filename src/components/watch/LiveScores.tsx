@@ -78,8 +78,8 @@ const LiveScores = () => {
       }));
       
       setLeagues(sortedLeagues);
-      // Reset to first slide when data changes
-      setCurrentLeagueIndex(0);
+      // Don't reset currentLeagueIndex here - let the bounds check effect handle it
+      // This preserves the user's position during data refreshes
       setError(null);
     } catch (err) {
       console.error('Error fetching fixtures:', err);
