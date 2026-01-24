@@ -233,8 +233,8 @@ serve(async (req) => {
       }
     }
 
-    // Sort competitions alphabetically by name
-    tickerCompetitions.sort((a, b) => a.competitionName.localeCompare(b.competitionName));
+    // Sort competitions by competition ID (numeric order)
+    tickerCompetitions.sort((a, b) => parseInt(a.competitionId, 10) - parseInt(b.competitionId, 10));
 
     console.log(`Returning ${tickerCompetitions.length} competitions with fixtures`);
 
