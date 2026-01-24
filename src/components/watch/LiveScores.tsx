@@ -128,6 +128,13 @@ const LiveScores = () => {
     }];
   });
 
+  // Ensure currentLeagueIndex is valid when slides change
+  useEffect(() => {
+    if (currentLeagueIndex >= slides.length && slides.length > 0) {
+      setCurrentLeagueIndex(0);
+    }
+  }, [slides.length, currentLeagueIndex]);
+
   // Rotate through slides
   useEffect(() => {
     if (slides.length <= 1) return;
@@ -139,7 +146,8 @@ const LiveScores = () => {
     return () => clearInterval(rotationInterval);
   }, [slides.length]);
 
-  const currentSlide = slides[currentLeagueIndex];
+  // Safely get current slide with bounds check
+  const currentSlide = slides.length > 0 ? slides[Math.min(currentLeagueIndex, slides.length - 1)] : null;
 
   // Get 3-letter abbreviation for team name
   const getTeamAbbr = (teamName: string): string => {
