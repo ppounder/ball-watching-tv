@@ -94,7 +94,7 @@ const Watch = () => {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-background overflow-hidden">
+    <div className="min-h-screen flex flex-col bg-background">
       <Header onScheduleClick={() => setScheduleOpen(true)} channelMode={mode} />
       
       {/* Schedule Sidebar */}
@@ -104,8 +104,8 @@ const Watch = () => {
         bundle={bundle} 
       />
       
-      {/* Main broadcast area - fills remaining height */}
-      <div className="flex-1 flex flex-col min-h-0 p-4 gap-2">
+      {/* Main broadcast area - fills remaining height, scrollable on small screens */}
+      <div className="flex-1 flex flex-col p-4 gap-2">
         {/* Mode-specific layout */}
         {renderLayout(mode)}
 
