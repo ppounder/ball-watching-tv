@@ -5,7 +5,7 @@ import BroadcastHeader from '@/components/watch/BroadcastHeader';
 import LiveScores from '@/components/watch/LiveScores';
 import LiveTicker from '@/components/watch/LiveTicker';
 import Vidiprinter from '@/components/watch/Vidiprinter';
-import AdPanel from '@/components/watch/AdPanel';
+import BallWatchingGPTPanel from '@/components/watch/BallWatchingGPTPanel';
 import UpNext from '@/components/watch/UpNext';
 import { Alert } from '@/types/broadcast';
 import { NowBundle, ScheduleItem } from '@/types/scheduler';
@@ -74,9 +74,9 @@ const LiveLayout = ({ alerts, isLoading, bundle, currentItem, nextItem }: LiveLa
           <Vidiprinter alerts={alerts} isLoading={isLoading} />
         </div>
 
-        {/* Right: Ad/Match Details Panel - matches scores width */}
+        {/* Right: Ball Watching GPT Panel - matches scores width */}
         <div className="hidden lg:block w-80 xl:w-96 flex-shrink-0">
-          <AdPanel />
+          <BallWatchingGPTPanel />
         </div>
       </div>
     </>
